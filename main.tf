@@ -96,7 +96,7 @@ resource "aws_db_proxy" "main" {
     engine_family          = var.engine_family
     idle_client_timeout    = var.idle_client_timeout
     require_tls            = var.require_tls
-    role_arn               = aws_iam_role.example.arn
+    role_arn               = aws_iam_role.role_rds.0.arn
     vpc_security_group_ids = var.vpc_security_group_ids
     vpc_subnet_ids         = var.vpc_subnet_ids
 
@@ -106,7 +106,7 @@ resource "aws_db_proxy" "main" {
             auth_scheme = lookup(auth.value, "auth_scheme", "SECRETS")
             description = lookup(auth.value, "description", null)
             iam_auth    = lookup(auth.value, "iam_auth", "DISABLED")
-            secret_arn  = lookup(auth.value, "secret_arn", null)
+            secret_arn  = aws_secretsmanager_secret.main.0.arn
             username    = lookup(auth.value, "username", null)
         }
     }
