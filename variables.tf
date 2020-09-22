@@ -34,7 +34,7 @@ variable "auth" {
     default = []
 }
 variable "default_tags" {
-    type = list(map)
+    type = map(string)
     default = {}
 }
 variable "recovery_window_in_days" {

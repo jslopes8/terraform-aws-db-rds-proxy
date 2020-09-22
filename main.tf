@@ -82,7 +82,7 @@ resource "aws_secretsmanager_secret_version" "main" {
     secret_string   = jsonencode(var.secret_string)
 
     lifecycle {
-        ignore_changes = [ "secret_string" ]
+        ignore_changes = [ secret_string ]
     }
 }
 
