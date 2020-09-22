@@ -107,7 +107,6 @@ resource "aws_db_proxy" "main" {
             description = lookup(auth.value, "description", null)
             iam_auth    = lookup(auth.value, "iam_auth", "DISABLED")
             secret_arn  = aws_secretsmanager_secret.main.0.arn
-            username    = lookup(auth.value, "username", null)
         }
     }
 
