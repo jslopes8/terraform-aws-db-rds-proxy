@@ -77,7 +77,7 @@ resource "aws_secretsmanager_secret" "main" {
 resource "aws_secretsmanager_secret_version" "main" {
     count = var.create ? 1 : 0
 
-    secret_id = aws_secretsmanager_secret.main.id
+    secret_id = aws_secretsmanager_secret.main.0.id
     version_stages  = var.version_stages
     secret_string   = jsonencode(var.secret_string)
 
