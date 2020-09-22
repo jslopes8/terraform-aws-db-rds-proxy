@@ -55,7 +55,7 @@ resource "aws_iam_role" "role_rds" {
 resource "aws_iam_policy" "main" {
     count = var.create ? 1 : 0
 
-    name = "${var.db_proxy_name)}-SecretManagerPolicy"
+    name = "${var.db_proxy_name}-SecretManagerPolicy"
     path = "/"
     policy = data.aws_iam_policy_document.main.0.json
 }
