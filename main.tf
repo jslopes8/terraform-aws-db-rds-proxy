@@ -88,7 +88,7 @@ resource "aws_secretsmanager_secret_version" "main" {
 
 ## RDS Proxy
 resource "aws_db_proxy" "main" {
-    depends_on = [ aws_iam_policy_document.main ]
+    depends_on = [ aws_iam_role.role_rds ]
     count = var.create ? 1 : 0
     
     name                   = var.db_proxy_name
