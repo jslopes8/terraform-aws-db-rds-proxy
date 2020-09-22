@@ -32,7 +32,7 @@ data "aws_iam_policy_document" "role_rds"  {
 
     statement {
         effect = "Allow"
-        principals = {
+        principals {
             type        = "Service"
             identifiers = [ "rds.amazonaws.com" ]
         }
@@ -59,10 +59,10 @@ resource "aws_iam_policy" "main" {
     path = "/"
     policy = data.aws_iam_policy_document.main.0.json
 }
-resource "aws_iam_role_policy_attachment" "test-attach" {
+resource "aws_iam_role_policy_attachment" "role_rds" {
     count = var.create ? 1 : 0
 
-    role       = aws_iam_role.role_rd.0.name
+    role       = aws_iam_role.role_rds.0.name
     policy_arn = aws_iam_policy.main.0.arn
 }
 
