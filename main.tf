@@ -42,7 +42,7 @@ data "aws_iam_policy_document" "role_rds"  {
 resource "aws_iam_role" "role_rds" {
     count = var.create ? 1 : 0
 
-    name               = "${var.db_proxy_name)}-SecretManagerRole"
+    name               = "${var.db_proxy_name}-SecretManagerRole"
     assume_role_policy = data.aws_iam_policy_document.role_rds.0.json
 
     tags = merge(
