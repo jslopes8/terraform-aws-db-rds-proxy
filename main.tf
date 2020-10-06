@@ -1,94 +1,8 @@
-data "aws_partition" "current" {}
-data "aws_region" "current" {}
-data "aws_caller_identity" "current" {}
+#
+# RDS Proxy
+#
 
-data "aws_iam_policy_document" "main"  {
-    count = var.create ? 1 : 0
-
-    statement {
-        effect = "Allow"
-        actions = [
-            "secretsmanager:GetRandomPassword",
-            "secretsmanager:CreateSecret",
-            "secretsmanager:ListSecrets"
-        ]
-        resources = [
-            "*"
-        ]
-    }
-    statement {
-        effect = "Allow"
-        actions = [
-            "secretsmanager:*",
-        ]
-        resources = [
-            aws_secretsmanager_secret.main.0.arn
-        ]
-    }
-
-}
-data "aws_iam_policy_document" "role_rds"  {
-    count = var.create ? 1 : 0
-
-    statement {
-        effect = "Allow"
-        principals {
-            type        = "Service"
-            identifiers = [ "rds.amazonaws.com" ]
-        }
-        actions = [ "sts:AssumeRole" ]
-    }
-}
-resource "aws_iam_role" "role_rds" {
-    count = var.create ? 1 : 0
-
-    name               = "${var.db_proxy_name}-SecretManagerRole"
-    assume_role_policy = data.aws_iam_policy_document.role_rds.0.json
-
-    tags = merge(
-        {
-            "Name" = "${format("%s", var.db_proxy_name)}-SecretManager"
-        },
-        var.default_tags,
-    )
-}
-resource "aws_iam_policy" "main" {
-    count = var.create ? 1 : 0
-
-    name = "${var.db_proxy_name}-SecretManagerPolicy"
-    path = "/"
-    policy = data.aws_iam_policy_document.main.0.json
-}
-resource "aws_iam_role_policy_attachment" "role_rds" {
-    count = var.create ? 1 : 0
-
-    role       = aws_iam_role.role_rds.0.name
-    policy_arn = aws_iam_policy.main.0.arn
-}
-
-## Secret Manager
-resource "aws_secretsmanager_secret" "main" {
-    count = var.create ? 1 : 0
-
-    name_prefix             = "${var.db_proxy_name}-secret"
-    recovery_window_in_days =  var.recovery_window_in_days
-    tags = var.default_tags
-}
-resource "aws_secretsmanager_secret_version" "main" {
-    count = var.create ? 1 : 0
-
-    secret_id = aws_secretsmanager_secret.main.0.id
-    version_stages  = var.version_stages
-    secret_string   = jsonencode(var.secret_string)
-
-    lifecycle {
-        ignore_changes = [ secret_string ]
-    }
-}
-
-## RDS Proxy
 resource "aws_db_proxy" "main" {
-    depends_on = [ aws_iam_role.role_rds ]
     count = var.create ? 1 : 0
     
     name                   = var.db_proxy_name
@@ -112,7 +26,7 @@ resource "aws_db_proxy" "main" {
 
     tags = var.default_tags
 }
-resource "aws_db_proxy_default_target_group" "example" {
+resource "aws_db_proxy_default_target_group" "main" {
     count = var.create ? length(var.connection_pool_config) : 0 
 
     db_proxy_name = aws_db_proxy.main.0.name
@@ -127,4 +41,12 @@ resource "aws_db_proxy_default_target_group" "example" {
             session_pinning_filters      = lookup(var.connection_pool_config.value, "session_pinning_filters", null)
         }
     }
+}
+resource "aws_db_proxy_target" "main" {
+    count = var.create ? 1 : 0
+
+    db_instance_identifier  = var.db_instance_identifier
+    db_cluster_identifier   = var.db_cluster_identifier
+    db_proxy_name           = aws_db_proxy.main.0.name
+    target_group_name       = aws_db_proxy_default_target_group.main.0.name
 }

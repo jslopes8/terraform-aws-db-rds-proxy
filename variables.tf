@@ -37,19 +37,15 @@ variable "default_tags" {
     type = map(string)
     default = {}
 }
-variable "recovery_window_in_days" {
-    type = number
-    default = "0"
-}
-variable "version_stages" {
-    type = list
-    default = ["AWSCURRENT"]
-}
-variable "secret_string" {
-    type = any
-    default = {}
-}
 variable "connection_pool_config" {
     type = any
     default = []
+}
+variable "db_instance_identifier" {
+    type = string
+    default = ""
+}
+variable "db_cluster_identifier" {
+    type = string
+    default = ""  
 }
