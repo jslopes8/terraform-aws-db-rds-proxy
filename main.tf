@@ -131,12 +131,14 @@ resource "aws_db_proxy_default_target_group" "main" {
 
     dynamic "connection_pool_config" {
         for_each = var.connection_pool_config
+
         content {
-            connection_borrow_timeout    = lookup(var.connection_pool_config.value, "connection_borrow_timeout", null)
-            init_query                   = lookup(var.connection_pool_config.value, "init_query", null)
-            max_connections_percent      = lookup(var.connection_pool_config.value, "max_connections_percent", null)
-            max_idle_connections_percent = lookup(var.connection_pool_config.value, "max_idle_connections_percent", null)
-            session_pinning_filters      = lookup(var.connection_pool_config.value, "session_pinning_filters", null)
+            
+            connection_borrow_timeout    = lookup(connection_pool_config.value, "connection_borrow_timeout", null)
+            init_query                   = lookup(connection_pool_config.value, "init_query", null)
+            max_connections_percent      = lookup(connection_pool_config.value, "max_connections_percent", null)
+            max_idle_connections_percent = lookup(connection_pool_config.value, "max_idle_connections_percent", null)
+            session_pinning_filters      = lookup(connection_pool_config.value, "session_pinning_filters", null)
         }
     }
 }
