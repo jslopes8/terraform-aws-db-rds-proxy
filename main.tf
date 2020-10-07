@@ -75,9 +75,9 @@ resource "aws_secretsmanager_secret" "main" {
     count = var.create ? length(var.secretsmanager) : 0
 
     name_prefix             = "${var.db_proxy_name}-secret"
-    recovery_window_in_days = length(var.secretsmanager[count.index], "recovery_window_in_days", null )
+    recovery_window_in_days = lookup(var.secretsmanager[count.index], "recovery_window_in_days", null )
     
-    tags = length(var.secretsmanager[count.index], "tags", null )
+    tags = lookup(var.secretsmanager[count.index], "tags", null )
 }
 
 resource "aws_secretsmanager_secret_version" "main" {
@@ -85,8 +85,8 @@ resource "aws_secretsmanager_secret_version" "main" {
 
     secret_id = aws_secretsmanager_secret.main.0.id
 
-    version_stages  = length(var.secretsmanager[count.index], "version_stages", null )
-    secret_string   = jsonencode(length(var.secretsmanager[count.index], "secret_string", null ))
+    version_stages  = lookup(var.secretsmanager[count.index], "version_stages", null )
+    secret_string   = jsonencode(lookup(var.secretsmanager[count.index], "secret_string", null ))
 
     lifecycle {
         ignore_changes = [ secret_string ]
