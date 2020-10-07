@@ -133,7 +133,7 @@ resource "aws_db_proxy_default_target_group" "main" {
         for_each = var.connection_pool_config
 
         content {
-            
+
             connection_borrow_timeout    = lookup(connection_pool_config.value, "connection_borrow_timeout", null)
             init_query                   = lookup(connection_pool_config.value, "init_query", null)
             max_connections_percent      = lookup(connection_pool_config.value, "max_connections_percent", null)
@@ -145,8 +145,8 @@ resource "aws_db_proxy_default_target_group" "main" {
 resource "aws_db_proxy_target" "main" {
     count = var.create ? 1 : 0
 
-    db_instance_identifier  = var.db_instance_identifier
-    db_cluster_identifier   = var.db_cluster_identifier
+    db_instance_identifier  = length(var.db_instance_identifier) > 0 ? var.db_instance_identifier : 0
+    db_cluster_identifier   = length(var.db_cluster_identifier) > 0 ? var.db_cluster_identifier : 0
     db_proxy_name           = aws_db_proxy.main.0.name
     target_group_name       = aws_db_proxy_default_target_group.main.0.name
 }
