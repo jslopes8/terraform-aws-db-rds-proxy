@@ -2,9 +2,6 @@
 # IAM Policy Document 
 #
 
-data "aws_region" "current" {}
-data "aws_caller_identity" "current" {}
-
 data "aws_iam_policy_document" "main"  {
     count = var.create ? 1 : 0
 
@@ -62,6 +59,7 @@ resource "aws_iam_policy" "main" {
     path = "/"
     policy = data.aws_iam_policy_document.main.0.json
 }
+
 resource "aws_iam_role_policy_attachment" "role_rds" {
     count = var.create ? 1 : 0
 
@@ -74,7 +72,7 @@ resource "aws_iam_role_policy_attachment" "role_rds" {
 #
 
 resource "aws_secretsmanager_secret" "main" {
-    count = var.create ? length(var.secretsmanager) 1 : 0
+    count = var.create ? length(var.secretsmanager) : 0
 
     name_prefix             = "${var.db_proxy_name}-secret"
     recovery_window_in_days = length(var.secretsmanager[count.index], "recovery_window_in_days", null )
@@ -83,7 +81,7 @@ resource "aws_secretsmanager_secret" "main" {
 }
 
 resource "aws_secretsmanager_secret_version" "main" {
-    count = var.create ? length(var.secretsmanager) 1 : 0
+    count = var.create ? length(var.secretsmanager) : 0
 
     secret_id = aws_secretsmanager_secret.main.0.id
 
