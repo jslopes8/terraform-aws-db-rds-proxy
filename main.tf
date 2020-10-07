@@ -1,4 +1,101 @@
 #
+# IAM Policy Document 
+#
+
+data "aws_region" "current" {}
+data "aws_caller_identity" "current" {}
+
+data "aws_iam_policy_document" "main"  {
+    count = var.create ? 1 : 0
+
+    statement {
+        effect = "Allow"
+        actions = [
+            "secretsmanager:GetRandomPassword",
+            "secretsmanager:CreateSecret",
+            "secretsmanager:ListSecrets"
+        ]
+        resources = [
+            "*"
+        ]
+    }
+    statement {
+        effect = "Allow"
+        actions = [
+            "secretsmanager:*",
+        ]
+        resources = [
+            aws_secretsmanager_secret.main.0.arn
+        ]
+    }
+
+}
+data "aws_iam_policy_document" "role_rds"  {
+    count = var.create ? 1 : 0
+
+    statement {
+        effect = "Allow"
+        principals {
+            type        = "Service"
+            identifiers = [ "rds.amazonaws.com" ]
+        }
+        actions = [ "sts:AssumeRole" ]
+    }
+}
+resource "aws_iam_role" "role_rds" {
+    count = var.create ? 1 : 0
+
+    name               = "${var.db_proxy_name}-SecretManagerRole"
+    assume_role_policy = data.aws_iam_policy_document.role_rds.0.json
+
+    tags = merge(
+        {
+            "Name" = "${format("%s", var.db_proxy_name)}-SecretManager"
+        },
+        var.default_tags,
+    )
+}
+resource "aws_iam_policy" "main" {
+    count = var.create ? 1 : 0
+
+    name = "${var.db_proxy_name}-SecretManagerPolicy"
+    path = "/"
+    policy = data.aws_iam_policy_document.main.0.json
+}
+resource "aws_iam_role_policy_attachment" "role_rds" {
+    count = var.create ? 1 : 0
+
+    role       = aws_iam_role.role_rds.0.name
+    policy_arn = aws_iam_policy.main.0.arn
+}
+
+#
+# Secret Manager
+#
+
+resource "aws_secretsmanager_secret" "main" {
+    count = var.create ? length(var.secretsmanager) 1 : 0
+
+    name_prefix             = "${var.db_proxy_name}-secret"
+    recovery_window_in_days = length(var.secretsmanager[count.index], "recovery_window_in_days", null )
+    
+    tags = length(var.secretsmanager[count.index], "tags", null )
+}
+
+resource "aws_secretsmanager_secret_version" "main" {
+    count = var.create ? length(var.secretsmanager) 1 : 0
+
+    secret_id = aws_secretsmanager_secret.main.0.id
+
+    version_stages  = length(var.secretsmanager[count.index], "version_stages", null )
+    secret_string   = jsonencode(length(var.secretsmanager[count.index], "secret_string", null ))
+
+    lifecycle {
+        ignore_changes = [ secret_string ]
+    }
+}
+
+#
 # RDS Proxy
 #
 
@@ -16,11 +113,14 @@ resource "aws_db_proxy" "main" {
 
     dynamic "auth" {
         for_each = var.auth
+
         content {
-            auth_scheme = lookup(auth.value, "auth_scheme", "SECRETS")
-            description = lookup(auth.value, "description", null)
-            iam_auth    = lookup(auth.value, "iam_auth", "DISABLED")
+
+            auth_scheme = lookup(auth.value, "auth_scheme", "SECRETS" )
+            description = lookup(auth.value, "description", null )
+            iam_auth    = lookup(auth.value, "iam_auth", "DISABLED" ) 
             secret_arn  = aws_secretsmanager_secret.main.0.arn
+
         }
     }
 
