@@ -49,3 +49,7 @@ variable "db_cluster_identifier" {
     type = string
     default = ""  
 }
+variable "secretsmanager"  {
+    type = any
+    default = []
+}
