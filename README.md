@@ -1,1 +1,1 @@
-# terraform-aws-db-proxy
+# Terraform RDS Proxy
