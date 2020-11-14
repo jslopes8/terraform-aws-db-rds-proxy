@@ -145,8 +145,8 @@ resource "aws_db_proxy_default_target_group" "main" {
 resource "aws_db_proxy_target" "main" {
     count = var.create ? 1 : 0
 
-    db_instance_identifier  = length(var.db_instance_identifier) == 1 ? var.db_instance_identifier : null
-    db_cluster_identifier   = length(var.db_cluster_identifier) == 1 ? var.db_cluster_identifier : null
+    db_instance_identifier  = length(var.db_instance_identifier) > 0 ? var.db_instance_identifier : null
+    db_cluster_identifier   = length(var.db_cluster_identifier) > 0 ? var.db_cluster_identifier : null
     db_proxy_name           = aws_db_proxy.main.0.name
     target_group_name       = aws_db_proxy_default_target_group.main.0.name
 }
