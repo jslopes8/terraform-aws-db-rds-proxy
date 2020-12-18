@@ -123,6 +123,8 @@ resource "aws_db_proxy" "main" {
     }
 
     tags = var.default_tags
+
+    depends_on = var.enabled_depends_on
 }
 resource "aws_db_proxy_default_target_group" "main" {
     count = var.create ? length(var.connection_pool_config) : 0 

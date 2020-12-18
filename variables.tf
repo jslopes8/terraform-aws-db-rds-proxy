@@ -53,3 +53,7 @@ variable "secretsmanager"  {
     type = any
     default = []
 }
+variable "enabled_depends_on" {
+    type = list
+    default = []
+}
