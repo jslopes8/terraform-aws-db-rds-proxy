@@ -3,7 +3,11 @@ Terraform module irá provisionar os seguintes recursos:
 
 * [DB Proxy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_proxy)
 * [DB Proxy Target](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_proxy_target)
-* [DB Proxy Default Target](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_proxy_default_target_group)  
+* [DB Proxy Default Target](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_proxy_default_target_group)
+* [Secret Manager Secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret)
+* [Secret Manager Secret Version](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version)
+* [IAM Policy Document](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document)
+* [IAM Role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role)
 
 # Usage
 `Caso de uso`: RDS Proxy MySQL com Secret Manager
